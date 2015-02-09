@@ -29,15 +29,17 @@ def read_elf_header(executable):
     ]
 
     parsed_header = {}
-    unpackerstr = ">Ibbbbb"
-    strmagic = "Magic (ELF Header):"
+    unpackerstr = "<bbbbbbbbb"
     
     header_data = struct.unpack(unpackerstr, bytes(executable[0:9]))
-    for i in range(0, 6):
+    parsed_header[HEADER_STRINGS.pop(0)] = header_data[0:4]
+
+    for i in range(4, 9):
         parsed_header[HEADER_STRINGS.pop(0)] = header_data[i]
 
-    for byte in bytes(parsed_header["EI_MAGIC"]):
-        strmagic += " {}".format(hex(ord(byte)))
+    strmagic = "Magic (ELF Header):"
+    for byte in parsed_header["EI_MAGIC"]:
+        strmagic += " {}".format(hex(byte))
     print(strmagic)
 
     if parsed_header["EI_CLASS"] == 0x01:
