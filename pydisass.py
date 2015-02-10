@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 import sys
-from elfconstants import E_TYPES, E_MACHINES
 from readelf import read_header, read_sections
 
 
