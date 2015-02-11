@@ -215,3 +215,37 @@ E_MACHINES = {
         222:"EM_FT32      FTDI Chip FT32 high performance 32-bit RISC architecture",
         223:"EM_MOXIE     Moxie processor family",
 	    }
+
+
+SECTION_HEADER_TYPES = {
+    0:"SHT_NULL",
+    1:"SHT_PROGBITS",
+    2:"SHT_SYMTAB",
+    3:"SHT_STRTAB",
+    4:"SHT_RELA",
+    5:"SHT_HASH",
+    6:"SHT_DYNAMIC",
+    7:"SHT_NOTE",
+    8:"SHT_NOBITS",
+    9:"SHT_REL",
+    10:"SHT_SHLIB",
+    11:"SHT_DYNSYM",
+    14:"SHT_INIT_ARRAY",
+    15:"SHT_FINI_ARRAY",
+    16:"SHT_PREINIT_ARRAY",
+    17:"SHT_GROUP",
+    18:"SHT_SYMTAB_SHNDX",
+    0x60000000:"SHT_LOOS",
+    0x6fffffff:"SHT_HIOS",
+    0x70000000:"SHT_LOPROC",
+    0x7fffffff:"SHT_HIPROC",
+    0x80000000:"SHT_LOUSER",
+    0x8fffffff:"SHT_HIUSER",
+    }
+
+SHT_LOOS = 0x60000000
+SHT_HIOS = 0x6fffffff
+SHT_LOPROC = 0x700000000
+SHT_HIPROC = 0x7ffffffff
+SHT_LOUSER = 0x800000000
+SHT_HIUSER = 0x8ffffffff

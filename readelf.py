@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import struct
-from elfconstants import E_TYPES, E_MACHINES
+from elfconstants import E_TYPES, E_MACHINES, SECTION_HEADER_TYPES, \
+    SHT_LOOS, SHT_HIOS, SHT_LOPROC, SHT_HIPROC, SHT_LOUSER, SHT_HIUSER
 
 class section_header:
     
@@ -68,13 +69,21 @@ class section_header:
         returnstr = ""
         
         if self._name is not None:
-            returnstr += 'Name: {}\n'.format(self._name)
+            returnstr += 'Name: {:20}  '.format(self._name)
 
         else:
-            returnstr += 'Name: {}\n'.format(self._nameind)
-
-        if self._type:
-            returnstr += 'Type: {}\n'.format(self._type)
+            returnstr += 'Name: {:20}  '.format(self._nameind)
+ 
+        if self._type in SECTION_HEADER_TYPES:
+            returnstr += 'Type: {:10}'.format(SECTION_HEADER_TYPES[self._type])
+        elif self._type >= SHT_LOOS and self._type <= SHT_HIOS:
+            returnstr += 'Type: OS    '
+        elif self._type >= SHT_LOPROC and self._type <= SHT_HIPROC:
+            returnstr += 'Type: PROC  '
+        elif self._type >= SHT_LOUSER and self._type <= SHT_HIUSER:
+            returnstr += 'Type: USER  '
+        else:
+            returnstr +=  'Type: Unknown({:3})'.format(hex(self._type))
 
         return returnstr
 
