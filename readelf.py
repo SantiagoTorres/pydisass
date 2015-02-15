@@ -87,10 +87,17 @@ class section_header:
 
         return returnstr
 
+class elf_executable:
 
+    header = None
+    section_headers = None
+    executable = None
 
+    def __init__(self, executable):
 
-
+        self.header = read_elf_header(executable)
+        self.section_headers = parse_elf_sections(executable, self.header)
+        self.executable = executable
 
 def read_elf_header(executable):
    
@@ -208,7 +215,6 @@ def build_elf_section(executable, offset, wordsize, size):
         "sh_info",
         "sh_addralign",
         "sh_entsize",
-
     ]
         
     parsed_section = {}
@@ -260,34 +266,14 @@ def parse_elf_sections(executable, parsed_headers):
 
     return
 
-
-HEADER_TYPES = {
-        '\x7fELF': read_elf_header
-        }
-
-SECTION_TYPES = {
-
-        '\x7fELF': parse_elf_sections,
-        }
-
-def read_header(executable):
+def read_executable(executable):
 
     magic = executable[:4]
 
-    if magic not in HEADER_TYPES: 
+    if magic != '\x7fELF': 
         raise Exception("Magic number not recognized!! {}".format(magic))
     else:
-        parsed_header = HEADER_TYPES[magic](executable)
+        parsed_executable = elf_executable(executable)
 
-    return parsed_header
-
-def read_sections(parsed_header, executable):
-
-    magic = executable[:4]
-
-    if magic not in HEADER_TYPES:
-        raise Exception("Magic number not recognized!! {}".format(magic))
-    else:
-        sections_read = SECTION_TYPES[magic](executable, parsed_header)
-
+    return parsed_executable 
 
