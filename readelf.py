@@ -286,7 +286,14 @@ class elf_executable:
 
     def build_elf_section(self, executable, offset, wordsize, size):
 
-        readstr = "<IIQQQQIIQQ"
+        if wordsize == 0x1:
+            readstr = "<IIIIIIIIII"
+
+        elif wordsize == 0x2:
+            readstr = "<IIQQQQIIQQ"
+        else:
+            raise Exception("Did we reach 128 bits yet?!")
+
         HEADER_SECTIONS = [
             "sh_name",
             "sh_type",
