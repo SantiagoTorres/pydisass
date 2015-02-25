@@ -179,7 +179,7 @@ class elf_executable:
     def __init__(self, executable):
 
         self.header = self.read_elf_header(executable)
-        self.section_headers = parse_elf_sections(executable, self.header)
+        self.section_headers = self.parse_elf_sections(executable, self.header)
         self.executable = executable
 
     def read_elf_header(self, executable):
@@ -284,70 +284,71 @@ class elf_executable:
 
         return parsed_header
 
-def build_elf_section(executable, offset, wordsize, size):
+    def build_elf_section(self, executable, offset, wordsize, size):
 
-    readstr = "<IIQQQQIIQQ"
-    HEADER_SECTIONS = [
-        "sh_name",
-        "sh_type",
-        "sh_flags",
-        "sh_addr",
-        "sh_offset",
-        "sh_size",
-        "sh_link",
-        "sh_info",
-        "sh_addralign",
-        "sh_entsize",
-    ]
+        readstr = "<IIQQQQIIQQ"
+        HEADER_SECTIONS = [
+            "sh_name",
+            "sh_type",
+            "sh_flags",
+            "sh_addr",
+            "sh_offset",
+            "sh_size",
+            "sh_link",
+            "sh_info",
+            "sh_addralign",
+            "sh_entsize",
+        ]
+            
+        parsed_section = {}
+        names = []
+
+        data = struct.unpack(readstr, executable[offset:offset+size])
+
+        for i in data:
+            parsed_section[HEADER_SECTIONS.pop(0)] = i
+
+        new_section_header = section_header(parsed_section)
+        return new_section_header
+
+    def build_string_table(self, executable, string_sections):
+
+        string = ''
+        for section in string_sections:
+            location = section._offset
+            length = section._size 
+            strings_table = executable[location:location + length]
+            if strings_table[1] == '.':
+                string += strings_table
+
+        return string
+
+    def parse_elf_sections(self, executable, parsed_headers):
+        no_of_entries = parsed_headers["E_SHNUM"]
+        wordsize      = parsed_headers["EI_CLASS"]
+        start_address = parsed_headers["E_SHOFF"]
+        size          = parsed_headers["E_SHENTSIZE"]
+
+
+        section_headers = [] 
+        string_sections = []
+        for i in range(0, no_of_entries):
+            section_header = self.build_elf_section(executable, 
+                    start_address + i*size,
+                    wordsize, size)
+            section_headers.append(section_header)
+            if section_header._type == 3:
+                string_sections.append(section_header)
+
+        strtable = self.build_string_table(executable, string_sections)
+
+        for section in section_headers:
+            section.fetch_name(strtable)
+            print(section.toString())
         
-    parsed_section = {}
-    names = []
-
-    data = struct.unpack(readstr, executable[offset:offset+size])
-
-    for i in data:
-        parsed_section[HEADER_SECTIONS.pop(0)] = i
-
-    new_section_header = section_header(parsed_section)
-    return new_section_header
-
-def build_string_table(executable, string_sections):
-
-    string = ''
-    for section in string_sections:
-        location = section._offset
-        length = section._size 
-        strings_table = executable[location:location + length]
-        if strings_table[1] == '.':
-            string += strings_table
-
-    return string
-
-def parse_elf_sections(executable, parsed_headers):
-    no_of_entries = parsed_headers["E_SHNUM"]
-    wordsize      = parsed_headers["EI_CLASS"]
-    start_address = parsed_headers["E_SHOFF"]
-    size          = parsed_headers["E_SHENTSIZE"]
 
 
-    section_headers = [] 
-    string_sections = []
-    for i in range(0, no_of_entries):
-        section_header = build_elf_section(executable, start_address + i*size,
-                wordsize, size)
-        section_headers.append(section_header)
-        if section_header._type == 3:
-            string_sections.append(section_header)
-
-    strtable = build_string_table(executable, string_sections)
-
-    for section in section_headers:
-        section.fetch_name(strtable)
-        print(section.toString())
-    
-
-
-    return
+        return
 
 def read_executable(executable):
 
